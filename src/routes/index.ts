@@ -8,7 +8,14 @@ router.get('/', (req, res) => res.send("inicio - github - readme - etc"))
 
 router.get('/universities', 
   async (req, res) => {
-    const universities = await prisma.universities.findMany()
+    const universities = await prisma.universities.findMany({
+      select: {
+        id: true,
+        name: true,
+        country: true,
+        state_province: true
+      }
+    })
     res.send(universities)
   }
 )
