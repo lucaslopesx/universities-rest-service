@@ -26,7 +26,7 @@ router.get('/universities', async (req: Request, res: Response) => {
       state_province: true
     },
   })
-  res.status(200).json(universities)
+  return res.status(200).json(universities)
 })
 
 
@@ -74,7 +74,7 @@ router.post('/universities', checkRequiredFields, verifyIfUniversityAlreadyExist
         state_province
       },
     })
-    res.status(201).json(newUniversity)
+    return res.status(201).json(newUniversity)
   }catch(error){
     if(error instanceof Prisma.PrismaClientValidationError){
       return res.status(500).json({error: error.message})
@@ -88,16 +88,6 @@ router.put('/universities/:id', verifyUniversityExistanceById, async (req: Reque
   const { web_pages, name, domains } = req.body as universities
 
   try{
-    // const university = await prisma.universities.findUnique({
-    //   where: {
-    //     id: id
-    //   }
-    // })
-
-    // if(!university){
-    //   return res.status(404).json({error: `University with given id:${id} not found`})
-    // }
-
     const updatedUniversity = await prisma.universities.update({
       data: {
         web_pages: web_pages,
@@ -109,7 +99,8 @@ router.put('/universities/:id', verifyUniversityExistanceById, async (req: Reque
       }
     })
 
-    res.status(200).json(updatedUniversity)
+    return res.status(200).json(updatedUniversity)
+
   }catch(error){
     if(error instanceof Prisma.PrismaClientValidationError){
       return res.status(500).json({error: error.message})
@@ -124,24 +115,14 @@ router.put('/universities/:id', verifyUniversityExistanceById, async (req: Reque
 
 router.delete('/universities/:id', verifyUniversityExistanceById, async (req: Request, res: Response) => {
   const { id } = req.params
-  try{
-
-    // const university = await prisma.universities.findUnique({
-    //   where: {
-    //     id: id
-    //   }
-    // })
-    // if(!university){
-    //   return res.status(404).json({error: `University with given id:${id} not found`})
-    // }
-    
+  try{    
     await prisma.universities.delete({
       where: {
         id: id
       }
     })
     
-    res.status(204).send()
+    return res.status(204).send()
 
   }catch(error){
     if(error instanceof Prisma.PrismaClientKnownRequestError){
