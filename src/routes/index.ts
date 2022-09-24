@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import { Prisma, PrismaClient, universities } from '@prisma/client'
-import { verifyIfUniversityAlreadyExists } from "../middlewares";
+import { checkRequiredFields, verifyIfUniversityAlreadyExists, verifyUniversityExistanceById } from "../middlewares";
 
 export const router = Router();
 const prisma = new PrismaClient();
@@ -32,16 +32,31 @@ router.get('/universities', async (req: Request, res: Response) => {
 
 router.get('/universities/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
-  const universities = await prisma.universities.findUnique({
-    where: {
-      id: id as string
+  try{
+    const university = await prisma.universities.findUnique({
+      where: {
+        id: id as string
+      }
+    })
+  
+    if(university){
+      return res.status(200).json(university)
     }
-  })
-  res.status(200).json(universities)
+  
+    return res.status(404).json({error: `University with given id:${id} not found`})
+  }catch(error){
+    if(error instanceof Prisma.PrismaClientKnownRequestError){
+      if(error.code === 'P2023' ){
+        return res.status(500).json(error.meta)
+      }
+    }
+    return res.status(500)
+  }
+  
 })
 
 
-router.post('/universities', verifyIfUniversityAlreadyExists, async (req: Request, res: Response, next) => {
+router.post('/universities', checkRequiredFields, verifyIfUniversityAlreadyExists, async (req: Request, res: Response, next) => {
   const { alpha_two_code, web_pages, name, country, domains, state_province } = req.body as universities;
 
   if(alpha_two_code.length != 2){
@@ -62,26 +77,27 @@ router.post('/universities', verifyIfUniversityAlreadyExists, async (req: Reques
     res.status(201).json(newUniversity)
   }catch(error){
     if(error instanceof Prisma.PrismaClientValidationError){
-      res.status(500).json({error: error.cause})
+      return res.status(500).json({error: error.message})
     }
+    return res.status(500)
   }
 })
 
-router.put('/universities/:id', async (req: Request, res: Response) => {
+router.put('/universities/:id', verifyUniversityExistanceById, async (req: Request, res: Response) => {
   const { id } = req.params
   const { web_pages, name, domains } = req.body as universities
 
-  const university = await prisma.universities.findUnique({
-    where: {
-      id: id
-    }
-  })
-
-  if(!university){
-    return res.status(404).json({error: `University with given id:${id} not found`})
-  }
-
   try{
+    // const university = await prisma.universities.findUnique({
+    //   where: {
+    //     id: id
+    //   }
+    // })
+
+    // if(!university){
+    //   return res.status(404).json({error: `University with given id:${id} not found`})
+    // }
+
     const updatedUniversity = await prisma.universities.update({
       data: {
         web_pages: web_pages,
@@ -96,31 +112,45 @@ router.put('/universities/:id', async (req: Request, res: Response) => {
     res.status(200).json(updatedUniversity)
   }catch(error){
     if(error instanceof Prisma.PrismaClientValidationError){
-      res.status(500).json({error: error.message})
+      return res.status(500).json({error: error.message})
+    }
+    if(error instanceof Prisma.PrismaClientKnownRequestError){
+      if(error.code === 'P2023' ){
+        return res.status(500).json(error.meta)
+      }
     }
   }
 })
 
-router.delete('/universities/:id', async (req: Request, res: Response) => {
+router.delete('/universities/:id', verifyUniversityExistanceById, async (req: Request, res: Response) => {
   const { id } = req.params
+  try{
 
-  const university = await prisma.universities.findUnique({
-    where: {
-      id: id
+    // const university = await prisma.universities.findUnique({
+    //   where: {
+    //     id: id
+    //   }
+    // })
+    // if(!university){
+    //   return res.status(404).json({error: `University with given id:${id} not found`})
+    // }
+    
+    await prisma.universities.delete({
+      where: {
+        id: id
+      }
+    })
+    
+    res.status(204).send()
+
+  }catch(error){
+    if(error instanceof Prisma.PrismaClientKnownRequestError){
+      if(error.code === 'P2023' ){
+        return res.status(500).json(error.meta)
+      }
     }
-  })
-
-  if(!university){
-    return res.status(404).json({error: `University with given id:${id} not found`})
+    return res.status(500)
   }
-
-  await prisma.universities.delete({
-    where: {
-      id: id
-    }
-  })
-
-  res.status(204).send()
 })
 
 
