@@ -1,7 +1,7 @@
 
-# Título do Projeto
+# REST API - Universidades
 
-Uma breve descrição sobre o que esse projeto faz e para quem ele é
+Este projeto se constitui em uma API contendo todos os métodos CRUD, utilizando NodeJS com Typescript, ExpressJs como framework WEB, MongoDB como banco de dados e o Prisma ORM.
 
 
 ## Stack utilizada
