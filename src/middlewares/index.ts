@@ -28,3 +28,18 @@ export async function verifyIfUniversityAlreadyExists(req: Request, res: Respons
     }
   }
 }
+
+export function checkRequiredFields(req: Request, res: Response, next: NextFunction){
+  const { alpha_two_code, web_pages, name, country, domains } = req.body as universities;
+
+  if(alpha_two_code === undefined
+    || web_pages === undefined
+    || name === undefined
+    || country === undefined
+    || domains === undefined 
+  ){
+    return res.status(400).json({ error: "Missing required fields"})
+  }
+
+  return next();
+}
