@@ -43,3 +43,28 @@ export function checkRequiredFields(req: Request, res: Response, next: NextFunct
 
   return next();
 }
+
+export async function verifyUniversityExistanceById(req: Request, res: Response, next: NextFunction){
+  const { id } = req.params
+  try{
+
+    const university = await prisma.universities.findUnique({
+      where: {
+        id: id
+      }
+    })
+    
+    if(!university){
+      return res.status(404).json({error: `University with given id:${id} not found`})
+    }
+    
+    return next()
+  }catch(error){
+    if(error instanceof Prisma.PrismaClientKnownRequestError){
+      if(error.code === 'P2023' ){
+        return res.status(500).json(error.meta)
+      }
+    }
+    return res.status(500)
+  }
+}
