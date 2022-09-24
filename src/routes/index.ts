@@ -26,7 +26,7 @@ router.get('/universities', async (req: Request, res: Response) => {
       state_province: true
     },
   })
-  res.send(universities)
+  res.status(200).json(universities)
 })
 
 
@@ -37,7 +37,7 @@ router.get('/universities/:id', async (req: Request, res: Response) => {
       id: id as string
     }
   })
-  res.send(universities)
+  res.status(200).json(universities)
 })
 
 
@@ -45,7 +45,7 @@ router.post('/universities', verifyIfUniversityAlreadyExists, async (req: Reques
   const { alpha_two_code, web_pages, name, country, domains, state_province } = req.body as universities;
 
   if(alpha_two_code.length != 2){
-    return next("alpha_two_code must have 2 letters")
+    return res.status(400).json({error: "alpha_two_code must have 2 letters"})
   }
 
   try{
@@ -59,34 +59,69 @@ router.post('/universities', verifyIfUniversityAlreadyExists, async (req: Reques
         state_province
       },
     })
-    res.json(newUniversity)
+    res.status(201).json(newUniversity)
   }catch(error){
     if(error instanceof Prisma.PrismaClientValidationError){
-      res.status(500).json({error: error.message})
+      res.status(500).json({error: error.cause})
     }
   }
 })
 
 router.put('/universities/:id', async (req: Request, res: Response) => {
   const { id } = req.params
-  const university = req.body as universities
+  const { web_pages, name, domains } = req.body as universities
+
+  const university = await prisma.universities.findUnique({
+    where: {
+      id: id
+    }
+  })
+
+  if(!university){
+    return res.status(404).json({error: `University with given id:${id} not found`})
+  }
 
   try{
     const updatedUniversity = await prisma.universities.update({
       data: {
-        web_pages: university.web_pages,
-        name: university.name,
-        domains: university.domains
+        web_pages: web_pages,
+        name: name,
+        domains: domains
       },
       where: {
         id: id
       }
     })
 
-    res.json(updatedUniversity)
+    res.status(200).json(updatedUniversity)
   }catch(error){
     if(error instanceof Prisma.PrismaClientValidationError){
       res.status(500).json({error: error.message})
     }
   }
 })
+
+router.delete('/universities/:id', async (req: Request, res: Response) => {
+  const { id } = req.params
+
+  const university = await prisma.universities.findUnique({
+    where: {
+      id: id
+    }
+  })
+
+  if(!university){
+    return res.status(404).json({error: `University with given id:${id} not found`})
+  }
+
+  await prisma.universities.delete({
+    where: {
+      id: id
+    }
+  })
+
+  res.status(204).send()
+})
+
+
+
