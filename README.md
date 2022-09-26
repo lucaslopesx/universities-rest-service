@@ -156,3 +156,8 @@ Inicie o servidor
 | Parâmetro   | Tipo       | Descrição                                   |
 | :---------- | :--------- | :------------------------------------------ |
 | `id`      | `string` | **Obrigatório**. O id do item que voce quer, no formato [ObjectId](https://www.mongodb.com/docs/manual/reference/method/ObjectId/) segundo a documentação do mongodb |
+
+
+## Dados utilizados
+
+Todos os dados de universidades utilizados neste projeto foram retirados da seguinte API pública [http://universities.hipolabs.com/](http://universities.hipolabs.com/)
