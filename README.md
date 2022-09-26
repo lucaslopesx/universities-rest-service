@@ -9,7 +9,24 @@ Este projeto se constitui em uma API contendo todos os métodos CRUD, utilizando
 ***Back-end:*** [Node](https://nodejs.org/en/), [Express](https://expressjs.com), [Prisma](https://www.prisma.io/)
 
 ***Banco de dados:*** [MongoDB](https://www.mongodb.com/docs/) 
-## Instalação
+
+## Instalação de depêndencias do servidor tendo como base o Ubuntu 20.04
+
+NodeJS - Versão 16x-lts
+
+```bash
+  sudo apt install nodejs
+```
+
+NPM - Versão 8.x
+
+```bash
+  sudo apt install npm
+```
+
+Verifique a versão do NodeJS e NPM e caso necessário atualize-os.
+
+## Instalação do projeto
 
 Instale universities-rest-service com npm
 
