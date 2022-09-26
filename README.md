@@ -62,6 +62,12 @@ Instale as dependências
   npm install
 ```
 
+Rode a configuração inicial do prisma que conecta seu projeto as variaveis de ambiente do arquivo .env
+
+```bash
+  npx prisma generate
+```
+
 Inicie o servidor
 
 ```bash
