@@ -5,7 +5,7 @@ import { checkRequiredFields, verifyIfUniversityAlreadyExists, verifyUniversityE
 export const router = Router();
 const prisma = new PrismaClient();
 
-router.get('/', (req, res) => res.send("inicio - github - readme - etc"))
+router.get('/', (req, res) => res.send("REST API Universities - https://github.com/lucaslopesx/universities-rest-service"))
 
 router.get('/universities', async (req: Request, res: Response) => {
   const country: string = req.query.country?.toString() || '';
