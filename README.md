@@ -48,7 +48,7 @@ Instale as dependências
 Inicie o servidor
 
 ```bash
-  npm run dev
+  npm run start
 ```
 
 
